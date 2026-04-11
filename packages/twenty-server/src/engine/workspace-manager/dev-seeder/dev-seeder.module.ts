@@ -9,7 +9,6 @@ import { FeatureFlagModule } from 'src/engine/core-modules/feature-flag/feature-
 import { SdkClientModule } from 'src/engine/core-modules/sdk-client/sdk-client.module';
 import { FileStorageModule } from 'src/engine/core-modules/file-storage/file-storage.module';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
-import { DataSourceModule } from 'src/engine/metadata-modules/data-source/data-source.module';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.module';
 import { ObjectMetadataEntity } from 'src/engine/metadata-modules/object-metadata/object-metadata.entity';
@@ -26,6 +25,7 @@ import { DevSeederDataService } from 'src/engine/workspace-manager/dev-seeder/da
 import { TimelineActivitySeederService } from 'src/engine/workspace-manager/dev-seeder/data/services/timeline-activity-seeder.service';
 import { DevSeederMetadataService } from 'src/engine/workspace-manager/dev-seeder/metadata/services/dev-seeder-metadata.service';
 import { DevSeederService } from 'src/engine/workspace-manager/dev-seeder/services/dev-seeder.service';
+import { StandardObjectsPrefillModule } from 'src/engine/workspace-manager/standard-objects-prefill-data/standard-objects-prefill.module';
 import { TwentyStandardApplicationModule } from 'src/engine/workspace-manager/twenty-standard-application/twenty-standard-application.module';
 import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace-migration/workspace-migration.module';
 
@@ -36,7 +36,6 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     WorkspaceDataSourceModule,
     WorkspaceCacheStorageModule,
     TypeORMModule,
-    DataSourceModule,
     RoleModule,
     RoleTargetModule,
     UserRoleModule,
@@ -48,6 +47,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
     TypeOrmModule.forFeature([WorkspaceEntity, ObjectMetadataEntity]),
     ObjectPermissionModule,
     WorkspaceManyOrAllFlatEntityMapsCacheModule,
+    StandardObjectsPrefillModule,
     WorkspaceCacheModule,
     WorkspaceMigrationModule,
     TwentyStandardApplicationModule,

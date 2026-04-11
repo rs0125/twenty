@@ -6,10 +6,7 @@ import { SettingsSkeletonLoader } from '@/settings/components/SettingsSkeletonLo
 import { SettingPublicDomain } from '@/settings/domains/components/SettingPublicDomain';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
-import {
-  FeatureFlagKey,
-  PermissionFlagType,
-} from '~/generated-metadata/graphql';
+import { PermissionFlagType } from '~/generated-metadata/graphql';
 
 const SettingsGraphQLPlayground = lazy(() =>
   import(
@@ -152,6 +149,18 @@ const SettingsApiWebhooks = lazy(() =>
 const SettingsAI = lazy(() =>
   import('~/pages/settings/ai/SettingsAI').then((module) => ({
     default: module.SettingsAI,
+  })),
+);
+
+const SettingsAIUsageUserDetail = lazy(() =>
+  import('~/pages/settings/ai/SettingsAIUsageUserDetail').then((module) => ({
+    default: module.SettingsAIUsageUserDetail,
+  })),
+);
+
+const SettingsToolDetail = lazy(() =>
+  import('~/pages/settings/ai/SettingsToolDetail').then((module) => ({
+    default: module.SettingsToolDetail,
   })),
 );
 
@@ -537,23 +546,23 @@ export const SettingsRoutes = ({ isAdminPageEnabled }: SettingsRoutesProps) => (
           element={<SettingsSkillForm mode="edit" />}
         />
         <Route
+          path={SettingsPath.AIUsageUserDetail}
+          element={<SettingsAIUsageUserDetail />}
+        />
+        <Route
+          path={SettingsPath.AIToolDetail}
+          element={<SettingsToolDetail />}
+        />
+        <Route
           path={SettingsPath.LogicFunctionDetail}
           element={<SettingsLogicFunctionDetail />}
         />
         <Route path={SettingsPath.Billing} element={<SettingsBilling />} />
+        <Route path={SettingsPath.Usage} element={<SettingsUsage />} />
         <Route
-          element={
-            <SettingsProtectedRouteWrapper
-              requiredFeatureFlag={FeatureFlagKey.IS_USAGE_ANALYTICS_ENABLED}
-            />
-          }
-        >
-          <Route path={SettingsPath.Usage} element={<SettingsUsage />} />
-          <Route
-            path={SettingsPath.UsageUserDetail}
-            element={<SettingsUsageUserDetail />}
-          />
-        </Route>
+          path={SettingsPath.UsageUserDetail}
+          element={<SettingsUsageUserDetail />}
+        />
         <Route
           path={SettingsPath.Subdomain}
           element={<SettingsSubdomainPage />}
@@ -679,7 +688,7 @@ export const SettingsRoutes = ({ isAdminPageEnabled }: SettingsRoutesProps) => (
       <Route
         element={
           <SettingsProtectedRouteWrapper
-            requiredFeatureFlag={FeatureFlagKey.IS_APPLICATION_ENABLED}
+            settingsPermission={PermissionFlagType.APPLICATIONS}
           />
         }
       >

@@ -19,6 +19,7 @@ import {
   SdkClientException,
   SdkClientExceptionCode,
 } from 'src/engine/core-modules/sdk-client/exceptions/sdk-client.exception';
+import { fromWorkspaceEntityToFlat } from 'src/engine/core-modules/workspace/utils/from-workspace-entity-to-flat.util';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { WorkspaceCacheService } from 'src/engine/workspace-cache/services/workspace-cache.service';
 
@@ -32,6 +33,8 @@ export class SdkClientGenerationService {
     private readonly fileStorageService: FileStorageService,
     @InjectRepository(ApplicationEntity)
     private readonly applicationRepository: Repository<ApplicationEntity>,
+    @InjectRepository(WorkspaceEntity)
+    private readonly workspaceRepository: Repository<WorkspaceEntity>,
     private readonly workspaceCacheService: WorkspaceCacheService,
     private readonly workspaceSchemaFactory: WorkspaceSchemaFactory,
   ) {}
@@ -44,13 +47,17 @@ export class SdkClientGenerationService {
     workspaceId: string;
     applicationId: string;
     applicationUniversalIdentifier: string;
-  }): Promise<void> {
+  }): Promise<Buffer> {
+    const workspaceEntity = await this.workspaceRepository.findOneByOrFail({
+      id: workspaceId,
+    });
+
     const graphqlSchema = await this.workspaceSchemaFactory.createGraphQLSchema(
-      { id: workspaceId } as WorkspaceEntity,
+      fromWorkspaceEntityToFlat(workspaceEntity),
       applicationId,
     );
 
-    await this.generateAndStore({
+    const archiveBuffer = await this.generateAndStore({
       workspaceId,
       applicationId,
       applicationUniversalIdentifier,
@@ -60,6 +67,8 @@ export class SdkClientGenerationService {
     this.logger.log(
       `Generated SDK client for application ${applicationUniversalIdentifier}`,
     );
+
+    return archiveBuffer;
   }
 
   private async generateAndStore({
@@ -72,7 +81,7 @@ export class SdkClientGenerationService {
     applicationId: string;
     applicationUniversalIdentifier: string;
     schema: string;
-  }): Promise<void> {
+  }): Promise<Buffer> {
     const temporaryDirManager = new TemporaryDirManager();
 
     try {
@@ -101,12 +110,14 @@ export class SdkClientGenerationService {
 
       await createZipFile(tempPackageRoot, archivePath);
 
+      const archiveBuffer = await fs.readFile(archivePath);
+
       await this.fileStorageService.writeFile({
         workspaceId,
         applicationUniversalIdentifier,
         fileFolder: FileFolder.GeneratedSdkClient,
         resourcePath: SDK_CLIENT_ARCHIVE_NAME,
-        sourceFile: await fs.readFile(archivePath),
+        sourceFile: archiveBuffer,
         mimeType: 'application/zip',
         settings: { isTemporaryFile: false, toDelete: false },
       });
@@ -119,6 +130,8 @@ export class SdkClientGenerationService {
       await this.workspaceCacheService.invalidateAndRecompute(workspaceId, [
         'flatApplicationMaps',
       ]);
+
+      return archiveBuffer;
     } catch (error) {
       throw new SdkClientException(
         `Failed to generate SDK client for application "${applicationUniversalIdentifier}" in workspace "${workspaceId}": ${error instanceof Error ? error.message : String(error)}`,

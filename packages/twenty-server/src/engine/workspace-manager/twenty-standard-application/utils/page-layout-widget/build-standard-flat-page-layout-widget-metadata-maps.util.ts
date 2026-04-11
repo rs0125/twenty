@@ -61,16 +61,31 @@ const WIDGET_TYPE_TO_CONFIGURATION_TYPE: Partial<
   [WidgetType.WORKFLOW_VERSION]: WidgetConfigurationType.WORKFLOW_VERSION,
   [WidgetType.WORKFLOW_RUN]: WidgetConfigurationType.WORKFLOW_RUN,
   [WidgetType.RECORD_TABLE]: WidgetConfigurationType.RECORD_TABLE,
+  [WidgetType.EMAIL_THREAD]: WidgetConfigurationType.EMAIL_THREAD,
 };
 
 const RECORD_PAGE_FIELDS_VIEW_NAME_BY_OBJECT: Partial<
   Record<AllStandardObjectName, string>
 > = {
+  blocklist: 'blocklistRecordPageFields',
+  calendarChannel: 'calendarChannelRecordPageFields',
+  calendarChannelEventAssociation:
+    'calendarChannelEventAssociationRecordPageFields',
+  calendarEventParticipant: 'calendarEventParticipantRecordPageFields',
   company: 'companyRecordPageFields',
-  person: 'personRecordPageFields',
-  opportunity: 'opportunityRecordPageFields',
-  task: 'taskRecordPageFields',
+  connectedAccount: 'connectedAccountRecordPageFields',
+  messageChannel: 'messageChannelRecordPageFields',
+  messageChannelMessageAssociation:
+    'messageChannelMessageAssociationRecordPageFields',
+  messageChannelMessageAssociationMessageFolder:
+    'messageChannelMessageAssociationMessageFolderRecordPageFields',
+  messageFolder: 'messageFolderRecordPageFields',
+  messageParticipant: 'messageParticipantRecordPageFields',
   note: 'noteRecordPageFields',
+  opportunity: 'opportunityRecordPageFields',
+  person: 'personRecordPageFields',
+  task: 'taskRecordPageFields',
+  workflowAutomatedTrigger: 'workflowAutomatedTriggerRecordPageFields',
   workflowRun: 'workflowRunRecordPageFields',
   workflowVersion: 'workflowVersionRecordPageFields',
 };
@@ -119,10 +134,9 @@ const buildRecordPageWidgetConfigurations = ({
   const baseConfig = { configurationType };
 
   return {
-    // @ts-expect-error ignore - configurationType is validated but TS can't match to discriminated union
-    configuration: baseConfig,
-    // @ts-expect-error ignore - we'd need to implement for each widget type (including unused GRAPH type) to be able to match to the discriminated union
-    universalConfiguration: baseConfig,
+    configuration: baseConfig as AllPageLayoutWidgetConfiguration,
+    universalConfiguration:
+      baseConfig as CreateStandardPageLayoutWidgetContext['universalConfiguration'],
   };
 };
 
@@ -305,6 +319,8 @@ const computeRecordPageWidgets = ({
               universalConfiguration,
               objectMetadataId,
               conditionalDisplay: widget.conditionalDisplay ?? null,
+              conditionalAvailabilityExpression:
+                widget.conditionalAvailabilityExpression ?? null,
             },
           }),
         );

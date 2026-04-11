@@ -25,6 +25,8 @@ import { UserWorkspaceModule } from 'src/engine/core-modules/user-workspace/user
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
 import { CheckCustomDomainValidRecordsCronCommand } from 'src/engine/core-modules/workspace/crons/commands/check-custom-domain-valid-records.cron.command';
 import { CheckCustomDomainValidRecordsCronJob } from 'src/engine/core-modules/workspace/crons/jobs/check-custom-domain-valid-records.cron.job';
+import { CoreEntityCacheModule } from 'src/engine/core-entity-cache/core-entity-cache.module';
+import { WorkspaceEntityCacheProviderService } from 'src/engine/core-modules/workspace/services/workspace-entity-cache-provider.service';
 import { WorkspaceService } from 'src/engine/core-modules/workspace/services/workspace.service';
 import { WorkspaceGaugeService } from 'src/engine/core-modules/workspace/workspace-gauge.service';
 import { workspaceAutoResolverOpts } from 'src/engine/core-modules/workspace/workspace.auto-resolver-opts';
@@ -32,7 +34,6 @@ import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.ent
 import { WorkspaceResolver } from 'src/engine/core-modules/workspace/workspace.resolver';
 import { BillingDisabledGuard } from 'src/engine/guards/billing-disabled.guard';
 import { AiAgentModule } from 'src/engine/metadata-modules/ai/ai-agent/ai-agent.module';
-import { DataSourceModule } from 'src/engine/metadata-modules/data-source/data-source.module';
 import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.module';
 import { ObjectMetadataModule } from 'src/engine/metadata-modules/object-metadata/object-metadata.module';
 import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
@@ -41,12 +42,14 @@ import { ViewModule } from 'src/engine/metadata-modules/view/view.module';
 import { WorkspaceCacheStorageModule } from 'src/engine/workspace-cache-storage/workspace-cache-storage.module';
 import { WorkspaceDataSourceModule } from 'src/engine/workspace-datasource/workspace-datasource.module';
 import { WorkspaceManagerModule } from 'src/engine/workspace-manager/workspace-manager.module';
+import { StandardObjectsPrefillModule } from 'src/engine/workspace-manager/standard-objects-prefill-data/standard-objects-prefill.module';
 
 @Module({
   imports: [
     TypeORMModule,
     TypeOrmModule.forFeature([BillingSubscriptionEntity, WorkspaceEntity]),
     MetricsModule,
+    StandardObjectsPrefillModule,
     NestjsQueryGraphQLModule.forFeature({
       imports: [
         AuditModule,
@@ -63,7 +66,6 @@ import { WorkspaceManagerModule } from 'src/engine/workspace-manager/workspace-m
         UserWorkspaceModule,
         WorkspaceManagerModule,
         FeatureFlagModule,
-        DataSourceModule,
         OnboardingModule,
         WorkspaceDataSourceModule,
         TypeORMModule,
@@ -79,6 +81,8 @@ import { WorkspaceManagerModule } from 'src/engine/workspace-manager/workspace-m
         WorkspaceManyOrAllFlatEntityMapsCacheModule,
         ApplicationModule,
         EnterpriseModule,
+        StandardObjectsPrefillModule,
+        CoreEntityCacheModule,
       ],
       services: [WorkspaceService],
       resolvers: workspaceAutoResolverOpts,
@@ -89,6 +93,7 @@ import { WorkspaceManagerModule } from 'src/engine/workspace-manager/workspace-m
     WorkspaceResolver,
     WorkspaceService,
     WorkspaceGaugeService,
+    WorkspaceEntityCacheProviderService,
     BillingDisabledGuard,
     CheckCustomDomainValidRecordsCronCommand,
     CheckCustomDomainValidRecordsCronJob,
